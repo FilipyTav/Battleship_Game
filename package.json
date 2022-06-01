@@ -4,6 +4,7 @@
     "description": "Battleship project - TOP",
     "main": "index.js",
     "private": true,
+    "type": "module",
     "scripts": {
         "test": "jest",
         "build": "webpack",
