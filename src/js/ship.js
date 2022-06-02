@@ -35,9 +35,3 @@ const Ship = (function () {
 })();
 
 export { Ship };
-
-const destroyer = Ship.make_ship(2);
-const submarine = Ship.make_ship(3);
-const cruiser = Ship.make_ship(3);
-const battleship = Ship.make_ship(4);
-const carrier = Ship.make_ship(5);

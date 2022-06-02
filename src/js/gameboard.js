@@ -1,6 +1,6 @@
 import { Ship } from "./ship";
 
-const Gameboard = (function () {
+const Gameboard = function () {
     const tiles = (function () {
         const rows = [];
 
@@ -15,20 +15,16 @@ const Gameboard = (function () {
         return rows;
     })();
 
-    const destroyer = Ship.make_ship(2);
-    const submarine = Ship.make_ship(3);
-    const cruiser = Ship.make_ship(3);
-    const battleship = Ship.make_ship(4);
-    const carrier = Ship.make_ship(5);
+    const ships = [];
 
-    const ships = [destroyer, submarine, cruiser, battleship, carrier];
-
-    const place_ship = (ship, [row, column], axis) => {
+    const place_ship = (length, [row, column], axis) => {
         if (!(axis === "x" || axis === "y")) return;
-        const length = ship.length;
-        ship.orientation = axis;
+        if (length < 2 || length > 5) return;
 
-        ship.coordinates = "";
+        const new_ship = Ship.make_ship(length);
+        new_ship.orientation = axis;
+
+        new_ship.coordinates = "";
 
         switch (axis) {
             case "x":
@@ -41,12 +37,12 @@ const Gameboard = (function () {
 
                 for (let i = 0; i < length; i++) {
                     column + i < 10
-                        ? (tiles[row][column + i] = ship.parts[i])
+                        ? (tiles[row][column + i] = new_ship.parts[i])
                         : tiles[row][column];
 
                     !(i === length - 1)
-                        ? (ship.coordinates += `(${[row, column + i]}); `)
-                        : (ship.coordinates += `(${[row, column + i]})`);
+                        ? (new_ship.coordinates += `(${[row, column + i]}); `)
+                        : (new_ship.coordinates += `(${[row, column + i]})`);
                 }
 
                 break;
@@ -61,12 +57,12 @@ const Gameboard = (function () {
 
                 for (let i = 0; i < length; i++) {
                     row + i < 10
-                        ? (tiles[row + i][column] = ship.parts[i])
+                        ? (tiles[row + i][column] = new_ship.parts[i])
                         : tiles[row][column];
 
                     !(i === length - 1)
-                        ? (ship.coordinates += `(${[row + i, column]}); `)
-                        : (ship.coordinates += `(${[row + i, column]})`);
+                        ? (new_ship.coordinates += `(${[row + i, column]}); `)
+                        : (new_ship.coordinates += `(${[row + i, column]})`);
                 }
 
                 break;
@@ -74,10 +70,9 @@ const Gameboard = (function () {
             default:
                 return;
         }
-    };
 
-    place_ship(destroyer, [0, 9], "y");
-    place_ship(submarine, [0, 6], "x");
+        ships.push(new_ship);
+    };
 
     const receive_attack = ([row, column]) => {
         switch (tiles[row][column]) {
@@ -102,13 +97,16 @@ const Gameboard = (function () {
             default:
                 return;
         }
+
+        return ships.every((ship) => ship.is_sunk());
     };
 
-    receive_attack([0, 9]);
-
-    receive_attack([0, 7]);
-
-    return { tiles, place_ship, receive_attack };
-})();
+    return {
+        tiles,
+        place_ship,
+        receive_attack,
+        ships,
+    };
+};
 
 export { Gameboard };
