@@ -18,15 +18,17 @@ const random_int = (min, max) => {
 };
 
 player1.attack = ([row, column]) => {
-    computer.gameboard.receive_attack([row, column]);
+    return computer.gameboard.receive_attack([row, column]);
 };
 
 computer.attack = () => {
-    player1.gameboard.receive_attack([random_int(0, 9), random_int(0, 9)]);
+    if (
+        player1.gameboard.receive_attack([
+            random_int(0, 9),
+            random_int(0, 9),
+        ]) === "no"
+    )
+        computer.attack();
 };
 
 player1.gameboard.place_ship(3, [2, 5], "x");
-
-computer.attack();
-computer.attack();
-computer.attack();

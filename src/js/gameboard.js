@@ -95,7 +95,7 @@ const Gameboard = function () {
                 break;
 
             default:
-                return;
+                return "no";
         }
 
         return ships.every((ship) => ship.is_sunk());
