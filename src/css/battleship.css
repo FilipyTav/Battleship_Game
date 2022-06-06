@@ -1,0 +1,62 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+body {
+    background: #111;
+}
+
+.main_container {
+    width: 100vw;
+    height: 100vh;
+
+    position: relative;
+}
+
+.player1_board,
+.computer_board {
+    width: 500px;
+    height: 500px;
+    outline: 5px solid #666;
+    background: linear-gradient(rgb(95, 95, 245), rgb(144, 247, 247));
+
+    position: absolute;
+
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+}
+
+.player1_board {
+    top: 50%;
+    left: 50px;
+
+    transform: translateY(-50%);
+}
+
+.computer_board {
+    bottom: 50%;
+    right: 50px;
+
+    transform: translateY(50%);
+}
+
+.board_tile {
+    border: 0.1px solid purple;
+    cursor: crosshair;
+}
+
+.board_tile.ship_part {
+    background: violet;
+}
+
+.board_tile.hit {
+    background: pink;
+    cursor: not-allowed;
+}
+
+.board_tile.ship_part.hit {
+    background: red;
+}
