@@ -52,11 +52,20 @@ body {
     background: violet;
 }
 
-.board_tile.hit {
-    background: pink;
+.board_tile.hit,
+.board_tile.no,
+.board_tile[player="human"] {
     cursor: not-allowed;
 }
 
+.board_tile.no {
+    user-select: none;
+}
+
+.board_tile.hit {
+    background: blue;
+}
+
 .board_tile.ship_part.hit {
-    background: red;
+    background: rgb(243, 64, 64);
 }

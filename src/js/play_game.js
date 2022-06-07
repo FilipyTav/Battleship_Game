@@ -15,18 +15,22 @@ const play_game = () => {
         return computer.gameboard.receive_attack([row, column]);
     };
 
-    computer.attack = () => {
-        if (
-            player1.gameboard.receive_attack([
-                random_int(0, 9),
-                random_int(0, 9),
-            ]) === "no"
-        )
+    const a = [];
+    computer.attack = function () {
+        const row = random_int(0, 9);
+        const column = random_int(0, 9);
+
+        a[0] = row;
+        a[1] = column;
+
+        if (player1.gameboard.receive_attack([row, column]) === "no")
             computer.attack();
     };
 
     DOM_el.populate_board(DOM_el.player1_board, player1);
     DOM_el.populate_board(DOM_el.computer_board, computer);
+
+    DOM_el.get_board_tiles(player1).forEach((tile) => tile.classList.add("no"));
 
     const place_ship_DOM = (player, length, [row, column], axis) => {
         const placed_ship = player.gameboard.place_ship(
@@ -68,7 +72,15 @@ const play_game = () => {
     const attack_DOM = (player, [row, column] = [0, 0]) => {
         switch (player.type) {
             case "AI":
+                const other_player = player1;
                 player.attack();
+                // [row, column] = a;
+                const r = a[0];
+                const c = a[1];
+
+                const tile_hit = DOM_el.get_specific_tile(other_player, [r, c]);
+
+                tile_hit.classList.add("hit");
                 break;
 
             case "human":
@@ -79,6 +91,37 @@ const play_game = () => {
                 return;
         }
     };
+
+    const play_turn = (player) => {
+        switch (player.type) {
+            case "AI":
+                attack_DOM(player);
+                break;
+
+            case "human":
+                break;
+
+            default:
+                return;
+        }
+    };
+
+    let coords = null;
+    const select_tile = (e) => {
+        e.target.classList.add("hit");
+        coords = e.target.getAttribute("data-id");
+        attack_DOM(player1, [Number(coords[0]), Number(coords[1])]);
+
+        setTimeout(() => {
+            play_turn(computer);
+        }, 300);
+    };
+
+    DOM_el.get_board_tiles(computer).forEach((tile) => {
+        tile.addEventListener("click", select_tile, {
+            once: true,
+        });
+    });
 
     place_ship_DOM(player1, 2, [0, 1], "x");
     place_ship_DOM(player1, 3, [2, 1], "x");
@@ -92,35 +135,11 @@ const play_game = () => {
     place_ship_DOM(computer, 4, [4, 6], "y");
     place_ship_DOM(computer, 5, [5, 8], "y");
 
-    const turn = (player) => {
-        let other_player_board;
-        switch (player.type) {
-            case "AI":
-                other_player_board = DOM_el.get_board_tiles(player1);
-
-                other_player_board.forEach((tile) => {
-                    tile.addEventListener("click", DOM_el.select_tile, {
-                        once: true,
-                    });
-                });
-                break;
-
-            case "human":
-                other_player_board = DOM_el.get_board_tiles(computer);
-
-                other_player_board.forEach((tile) => {
-                    tile.addEventListener("click", DOM_el.select_tile, {
-                        once: true,
-                    });
-                });
-                break;
-
-            default:
-                return;
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "j") {
+            console.log(player1.gameboard.tiles, computer.gameboard.tiles);
         }
-    };
-
-    turn(player1);
+    });
 };
 
 export { play_game };

@@ -60,10 +60,6 @@ const DOM_el = (function () {
         );
     };
 
-    const select_tile = (e, tile) => {
-        e.target.classList.add("hit");
-    };
-
     return {
         main_container,
         player1_board,
@@ -73,7 +69,6 @@ const DOM_el = (function () {
         get_board_tiles,
         get_next_tile,
         get_specific_tile,
-        select_tile,
     };
 })();
 
