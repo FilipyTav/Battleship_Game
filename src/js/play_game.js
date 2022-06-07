@@ -5,32 +5,88 @@ const play_game = () => {
     const player1 = Player("human");
     const computer = Player("AI");
 
+    DOM_el.populate_board(DOM_el.player1_board, player1);
+    DOM_el.populate_board(DOM_el.computer_board, computer);
+
+    DOM_el.get_board_tiles(player1).forEach((tile) => tile.classList.add("no"));
+
     const random_int = (min, max) => {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    player1.attack = ([row, column]) => {
-        return computer.gameboard.receive_attack([row, column]);
+    let end = false;
+    const reset_game = () => {
+        DOM_el.get_board_tiles(player1).forEach((tile) =>
+            tile.classList.remove("hit", "ship_part")
+        );
+        player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
+
+        DOM_el.get_board_tiles(computer).forEach((tile) => {
+            tile.classList.remove("hit", "ship_part");
+            tile.removeEventListener("click", select_tile, {
+                once: true,
+            });
+        });
+        computer.gameboard.ships.splice(0, player1.gameboard.ships.length);
+
+        for (let i = 0; i < computer.gameboard.tiles.length; i++) {
+            for (let j = 0; j < computer.gameboard.tiles[i].length; j++) {
+                computer.gameboard.tiles[i][j] = "w";
+                player1.gameboard.tiles[i][j] = "w";
+            }
+        }
+
+        end = true;
     };
 
-    const a = [];
+    player1.attack = ([row, column]) => {
+        const result = computer.gameboard.receive_attack([row, column]);
+
+        switch (result) {
+            case true:
+                alert("You win!!!");
+                reset_game();
+                break;
+
+            case false:
+                break;
+
+            default:
+                return "no";
+        }
+    };
+
+    const cds = [];
     computer.attack = function () {
         const row = random_int(0, 9);
         const column = random_int(0, 9);
 
-        a[0] = row;
-        a[1] = column;
+        cds[0] = row;
+        cds[1] = column;
 
-        if (player1.gameboard.receive_attack([row, column]) === "no")
-            computer.attack();
+        const result = player1.gameboard.receive_attack([row, column]);
+
+        switch (result) {
+            case "no":
+                computer.attack();
+                break;
+
+            case true:
+                setTimeout(() => {
+                    alert("The computer wins!!!");
+                    reset_game();
+                }, 300);
+                break;
+
+            case false:
+                break;
+
+            default:
+                return;
+        }
     };
-
-    DOM_el.populate_board(DOM_el.player1_board, player1);
-    DOM_el.populate_board(DOM_el.computer_board, computer);
-
-    DOM_el.get_board_tiles(player1).forEach((tile) => tile.classList.add("no"));
 
     const place_ship_DOM = (player, length, [row, column], axis) => {
         const placed_ship = player.gameboard.place_ship(
@@ -74,9 +130,9 @@ const play_game = () => {
             case "AI":
                 const other_player = player1;
                 player.attack();
-                // [row, column] = a;
-                const r = a[0];
-                const c = a[1];
+
+                const r = cds[0];
+                const c = cds[1];
 
                 const tile_hit = DOM_el.get_specific_tile(other_player, [r, c]);
 
@@ -108,12 +164,13 @@ const play_game = () => {
 
     let coords = null;
     const select_tile = (e) => {
+        // TODO: Improve the current "turn switch system"
         e.target.classList.add("hit");
         coords = e.target.getAttribute("data-id");
         attack_DOM(player1, [Number(coords[0]), Number(coords[1])]);
 
         setTimeout(() => {
-            play_turn(computer);
+            if (end === false) play_turn(computer);
         }, 300);
     };
 
@@ -136,8 +193,12 @@ const play_game = () => {
     place_ship_DOM(computer, 5, [5, 8], "y");
 
     document.addEventListener("keydown", (e) => {
-        if (e.key === "j") {
-            console.log(player1.gameboard.tiles, computer.gameboard.tiles);
+        if (e.key === "r") {
+            reset_game();
+            // console.log(player1.gameboard.tiles, computer.gameboard.tiles);
+            // console.log(computer.gameboard.tiles);
+            console.log(computer);
+            console.log(player1);
         }
     });
 };
