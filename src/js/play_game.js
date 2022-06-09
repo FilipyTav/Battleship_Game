@@ -18,17 +18,8 @@ const play_game = () => {
 
     let end = false;
     const reset_game = () => {
-        DOM_el.get_board_tiles(player1).forEach((tile) =>
-            tile.classList.remove("hit", "ship_part")
-        );
         player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
 
-        DOM_el.get_board_tiles(computer).forEach((tile) => {
-            tile.classList.remove("hit", "ship_part");
-            tile.removeEventListener("click", select_tile, {
-                once: true,
-            });
-        });
         computer.gameboard.ships.splice(0, player1.gameboard.ships.length);
 
         for (let i = 0; i < computer.gameboard.tiles.length; i++) {
@@ -39,6 +30,7 @@ const play_game = () => {
         }
 
         end = true;
+        play_game();
     };
 
     player1.attack = ([row, column]) => {
@@ -191,16 +183,6 @@ const play_game = () => {
     place_ship_DOM(computer, 3, [3, 4], "y");
     place_ship_DOM(computer, 4, [4, 6], "y");
     place_ship_DOM(computer, 5, [5, 8], "y");
-
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "r") {
-            reset_game();
-            // console.log(player1.gameboard.tiles, computer.gameboard.tiles);
-            // console.log(computer.gameboard.tiles);
-            console.log(computer);
-            console.log(player1);
-        }
-    });
 };
 
 export { play_game };

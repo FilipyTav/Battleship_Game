@@ -12,6 +12,9 @@ const DOM_el = (function () {
     };
 
     const populate_board = (board, player) => {
+        while (board.lastChild) {
+            board.lastChild.remove();
+        }
         for (let i = 0; i < player.gameboard.tiles.flat().length; i++) {
             const board_tile = create_board_tile();
             board_tile.setAttribute(
