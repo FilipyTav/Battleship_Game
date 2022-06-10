@@ -80,43 +80,6 @@ const play_game = () => {
         }
     };
 
-    const place_ship_DOM = (player, length, [row, column], axis) => {
-        const placed_ship = player.gameboard.place_ship(
-            length,
-            [row, column],
-            axis
-        );
-
-        const base_tile = DOM_el.get_board_tiles(player).find(
-            (tile) => tile.getAttribute("data-id") === `${row}${column}`
-        );
-
-        const ship_tiles = [base_tile];
-
-        switch (axis) {
-            case "x":
-                for (let i = 0; i < length - 1; i++) {
-                    ship_tiles.push(
-                        DOM_el.get_next_tile(axis, player, ship_tiles[i])
-                    );
-                }
-                break;
-
-            case "y":
-                for (let i = 0; i < length - 1; i++) {
-                    ship_tiles.push(
-                        DOM_el.get_next_tile(axis, player, ship_tiles[i])
-                    );
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        ship_tiles.forEach((tile) => tile.classList.add("ship_part"));
-    };
-
     const attack_DOM = (player, [row, column] = [0, 0]) => {
         switch (player.type) {
             case "AI":
@@ -172,17 +135,29 @@ const play_game = () => {
         });
     });
 
-    place_ship_DOM(player1, 2, [0, 1], "x");
-    place_ship_DOM(player1, 3, [2, 1], "x");
-    place_ship_DOM(player1, 3, [4, 1], "x");
-    place_ship_DOM(player1, 4, [6, 1], "x");
-    place_ship_DOM(player1, 5, [4, 8], "y");
+    // place_ship_DOM(player1, 2, [0, 1], "x");
+    // place_ship_DOM(player1, 3, [2, 1], "x");
+    // place_ship_DOM(player1, 3, [4, 1], "x");
+    // place_ship_DOM(player1, 4, [6, 1], "x");
+    // place_ship_DOM(player1, 5, [4, 8], "y");
 
-    place_ship_DOM(computer, 2, [1, 0], "y");
-    place_ship_DOM(computer, 3, [2, 2], "y");
-    place_ship_DOM(computer, 3, [3, 4], "y");
-    place_ship_DOM(computer, 4, [4, 6], "y");
-    place_ship_DOM(computer, 5, [5, 8], "y");
+    // place_ship_DOM(computer, 2, [1, 0], "y");
+    // place_ship_DOM(computer, 3, [2, 2], "y");
+    // place_ship_DOM(computer, 3, [3, 4], "y");
+    // place_ship_DOM(computer, 4, [4, 6], "y");
+    // place_ship_DOM(computer, 5, [5, 8], "y");
+
+    DOM_el.create_ship_DOM(2);
+    DOM_el.create_ship_DOM(3);
+    DOM_el.create_ship_DOM(3);
+    DOM_el.create_ship_DOM(4);
+    DOM_el.create_ship_DOM(5);
+
+    DOM_el.activate_drag_over_tiles(player1);
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "d") console.log(player1.gameboard.tiles);
+    });
 };
 
 export { play_game };
