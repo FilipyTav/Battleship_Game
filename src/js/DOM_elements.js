@@ -157,10 +157,17 @@ const DOM_el = (function () {
         return [...document.querySelectorAll(".ship_container")];
     };
 
+    document.addEventListener("dragover", (event) => {
+        // prevent default to allow drop
+        event.preventDefault();
+    });
+
     const activate_drag_over_tiles = (player) => {
         DOM_el.get_board_tiles(player).forEach((tile) => {
-            tile.addEventListener("dragover", (e) => {
+            tile.addEventListener("drop", (e) => {
                 e.preventDefault();
+                // tile.classList.remove("placing_preview");
+
                 const selected = document.querySelector(".being_dragged");
 
                 const ship_size = Number(selected.getAttribute("size"));
@@ -171,13 +178,55 @@ const DOM_el = (function () {
                     ? (orientation = "y")
                     : (orientation = "x");
 
-                if (is_valid(ship_size, orientation, tile, player))
+                if (is_valid(ship_size, orientation, tile, player)) {
                     place_ship_DOM(
                         player,
                         ship_size,
                         [current_row, current_column],
                         orientation
                     );
+                    let next = tile;
+                    for (let i = 0; i < ship_size; i++) {
+                        next.classList.remove("placing_preview");
+                        next = get_next_tile(orientation, player, next);
+                    }
+                }
+            });
+
+            tile.addEventListener("dragenter", (e) => {
+                const selected = document.querySelector(".being_dragged");
+
+                const ship_size = Number(selected.getAttribute("size"));
+                let orientation = null;
+                selected.classList.contains("vertical")
+                    ? (orientation = "y")
+                    : (orientation = "x");
+
+                if (is_valid(ship_size, orientation, tile, player)) {
+                    setTimeout(() => {
+                        let next = tile;
+                        for (let i = 0; i < ship_size; i++) {
+                            next.classList.add("placing_preview");
+                            next = get_next_tile(orientation, player, next);
+                        }
+                    }, 0.1);
+                }
+            });
+
+            tile.addEventListener("dragleave", (e) => {
+                const selected = document.querySelector(".being_dragged");
+
+                const ship_size = Number(selected.getAttribute("size"));
+                let orientation = null;
+                selected.classList.contains("vertical")
+                    ? (orientation = "y")
+                    : (orientation = "x");
+
+                let next = tile;
+                for (let i = 0; i < ship_size; i++) {
+                    next.classList.remove("placing_preview");
+                    next = get_next_tile(orientation, player, next);
+                }
             });
         });
     };

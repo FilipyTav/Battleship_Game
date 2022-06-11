@@ -127,3 +127,11 @@ button.change_orientation:active {
 .being_dragged .ship_part {
     background: rgb(238, 130, 238, 0.7);
 }
+
+.placing_preview {
+    background: lime;
+}
+
+[player="human"].board_tile {
+    user-select: none;
+}
