@@ -19,6 +19,7 @@ const DOM_el = (function () {
         while (board.lastChild) {
             board.lastChild.remove();
         }
+
         for (let i = 0; i < player.gameboard.tiles.flat().length; i++) {
             const board_tile = create_board_tile();
             board_tile.setAttribute(
@@ -30,6 +31,7 @@ const DOM_el = (function () {
             );
 
             board_tile.setAttribute("player", player.type);
+            board_tile.classList.add("no");
             board.append(board_tile);
         }
     };
@@ -178,10 +180,12 @@ const DOM_el = (function () {
         DOM_el.create_ship_DOM(5);
     };
 
-    const attack_DOM = (player, [row, column] = [0, 0], other_player) => {
+    const attack_DOM = (player, [row, column] = [0, 0]) => {
         switch (player.type) {
             case "AI":
                 player.attack();
+
+                const other_player = Game.player1;
 
                 const r = Game.cds[0];
                 const c = Game.cds[1];
@@ -200,21 +204,22 @@ const DOM_el = (function () {
         }
     };
 
-    const select_tile = (target, computer, player1) => {
+    const select_tile = (target) => {
         // TODO: Improve the current "turn switch system"
         target.classList.add("hit");
         let coords = target.getAttribute("data-id");
-        attack_DOM(player1, [Number(coords[0]), Number(coords[1])], computer);
+        attack_DOM(Game.player1, [Number(coords[0]), Number(coords[1])]);
 
         setTimeout(() => {
-            if (Game.end === false) play_turn(computer, player1);
+            console.log(Game.end);
+            if (Game.end === false) play_turn(Game.computer);
         }, 300);
     };
 
-    const play_turn = (player, other_player) => {
+    const play_turn = (player) => {
         switch (player.type) {
             case "AI":
-                attack_DOM(player, [0, 0], other_player);
+                attack_DOM(player, [0, 0]);
                 break;
 
             case "human":
@@ -225,18 +230,19 @@ const DOM_el = (function () {
         }
     };
 
-    const activate_start_button = (computer, player1) => {
+    const activate_start_button = () => {
         const btn = document.querySelector(".start_game_btn");
         btn.addEventListener("click", () => {
             setTimeout(() => {
                 btn.remove();
             }, 300);
 
-            get_board_tiles(computer).forEach((tile) => {
+            get_board_tiles(Game.computer).forEach((tile) => {
+                tile.classList.remove("no");
                 tile.addEventListener(
                     "click",
                     (e) => {
-                        select_tile(e.target, computer, player1);
+                        select_tile(e.target);
                     },
                     { once: true }
                 );
@@ -249,7 +255,7 @@ const DOM_el = (function () {
         event.preventDefault();
     });
 
-    const activate_drag_over_tiles = (player, computer) => {
+    const activate_drag_over_tiles = (player) => {
         get_board_tiles(player).forEach((tile) => {
             tile.addEventListener("drop", (e) => {
                 e.preventDefault();
@@ -271,6 +277,7 @@ const DOM_el = (function () {
                         [current_row, current_column],
                         orientation
                     );
+
                     let next = tile;
                     for (let i = 0; i < ship_size; i++) {
                         next.classList.remove("placing_preview");
@@ -286,7 +293,7 @@ const DOM_el = (function () {
 
                     ships_container.append(play_game_button);
 
-                    activate_start_button(computer, player);
+                    activate_start_button();
                 }
             });
 

@@ -1,7 +1,28 @@
 import { DOM_el } from "./DOM_elements";
-import { play_game } from "./play_game";
+import { Player } from "./player";
 
 const Game = (function () {
+    const player1 = Player("human");
+    const computer = Player("AI");
+
+    const play_game = () => {
+        DOM_el.populate_board(DOM_el.player1_board, player1);
+        DOM_el.populate_board(DOM_el.computer_board, computer);
+
+        add_attack_methods(player1);
+        add_attack_methods(computer);
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "d") console.log(computer.gameboard);
+        });
+
+        choose_tiles_automatically(computer);
+
+        DOM_el.reset_ships_container();
+
+        DOM_el.activate_drag_over_tiles(player1);
+    };
+
     const random_int = (min, max) => {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -22,35 +43,35 @@ const Game = (function () {
     };
 
     let end = false;
-    const reset_game = (player1, player2) => {
+    const reset_game = () => {
+        end = true;
         player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
 
-        player2.gameboard.ships.splice(0, player2.gameboard.ships.length);
+        computer.gameboard.ships.splice(0, computer.gameboard.ships.length);
 
-        for (let i = 0; i < player2.gameboard.tiles.length; i++) {
-            for (let j = 0; j < player2.gameboard.tiles[i].length; j++) {
+        for (let i = 0; i < computer.gameboard.tiles.length; i++) {
+            for (let j = 0; j < computer.gameboard.tiles[i].length; j++) {
+                computer.gameboard.tiles[i][j] = "w";
                 player1.gameboard.tiles[i][j] = "w";
-                player2.gameboard.tiles[i][j] = "w";
             }
         }
 
-        end = true;
         play_game();
     };
 
     const cds = [];
 
-    const add_attack_methods = (player, other_player) => {
+    const add_attack_methods = (player) => {
         switch (player.type) {
             case "AI":
                 player.attack = function () {
-                    const row = Game.random_int(0, 9);
-                    const column = Game.random_int(0, 9);
+                    const row = random_int(0, 9);
+                    const column = random_int(0, 9);
 
                     cds[0] = row;
                     cds[1] = column;
 
-                    const result = other_player.gameboard.receive_attack([
+                    const result = player1.gameboard.receive_attack([
                         row,
                         column,
                     ]);
@@ -63,7 +84,7 @@ const Game = (function () {
                         case true:
                             setTimeout(() => {
                                 alert("The computer wins!!!");
-                                reset_game(player, other_player);
+                                reset_game();
                             }, 300);
                             break;
 
@@ -78,7 +99,7 @@ const Game = (function () {
 
             case "human":
                 player.attack = ([row, column]) => {
-                    const result = other_player.gameboard.receive_attack([
+                    const result = computer.gameboard.receive_attack([
                         row,
                         column,
                     ]);
@@ -86,7 +107,7 @@ const Game = (function () {
                     switch (result) {
                         case true:
                             alert("You win!!!");
-                            reset_game(player, other_player);
+                            reset_game();
                             break;
 
                         case false:
@@ -182,6 +203,9 @@ const Game = (function () {
     };
 
     return {
+        player1,
+        computer,
+        play_game,
         random_int,
         random_axis,
         end,
