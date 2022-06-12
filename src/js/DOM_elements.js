@@ -126,35 +126,53 @@ const DOM_el = (function () {
             (tile) => tile.getAttribute("data-id") === `${row}${column}`
         );
 
-        const ship_tiles = [base_tile];
+        if (is_valid(length, axis, base_tile, player)) {
+            const ship_tiles = [base_tile];
 
-        switch (axis) {
-            case "x":
-                for (let i = 0; i < length - 1; i++) {
-                    ship_tiles.push(get_next_tile(axis, player, ship_tiles[i]));
-                }
-                break;
+            switch (axis) {
+                case "x":
+                    for (let i = 0; i < length - 1; i++) {
+                        ship_tiles.push(
+                            get_next_tile(axis, player, ship_tiles[i])
+                        );
+                    }
+                    break;
 
-            case "y":
-                for (let i = 0; i < length - 1; i++) {
-                    ship_tiles.push(get_next_tile(axis, player, ship_tiles[i]));
-                }
-                break;
+                case "y":
+                    for (let i = 0; i < length - 1; i++) {
+                        ship_tiles.push(
+                            get_next_tile(axis, player, ship_tiles[i])
+                        );
+                    }
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
+
+            ship_tiles.forEach((tile) => tile.classList.add("ship_part"));
+
+            const placed_ship = player.gameboard.place_ship(
+                length,
+                [row, column],
+                axis
+            );
+        } else {
+            return false;
         }
-
-        ship_tiles.forEach((tile) => tile.classList.add("ship_part"));
-        const placed_ship = player.gameboard.place_ship(
-            length,
-            [row, column],
-            axis
-        );
     };
 
     const all_ship_containers = () => {
         return [...document.querySelectorAll(".ship_container")];
+    };
+
+    const activate_start_button = () => {
+        const btn = document.querySelector(".start_game_btn");
+        btn.addEventListener("click", () => {
+            setTimeout(() => {
+                btn.remove();
+            }, 300);
+        });
     };
 
     document.addEventListener("dragover", (event) => {
@@ -166,7 +184,6 @@ const DOM_el = (function () {
         DOM_el.get_board_tiles(player).forEach((tile) => {
             tile.addEventListener("drop", (e) => {
                 e.preventDefault();
-                // tile.classList.remove("placing_preview");
 
                 const selected = document.querySelector(".being_dragged");
 
@@ -190,6 +207,17 @@ const DOM_el = (function () {
                         next.classList.remove("placing_preview");
                         next = get_next_tile(orientation, player, next);
                     }
+                    selected.remove();
+                }
+
+                if (ships_container.childElementCount === 0) {
+                    const play_game_button = document.createElement("button");
+                    play_game_button.classList.add("start_game_btn");
+                    play_game_button.textContent = "Start Game";
+
+                    ships_container.append(play_game_button);
+
+                    activate_start_button();
                 }
             });
 
@@ -243,6 +271,7 @@ const DOM_el = (function () {
         create_ship_DOM,
         all_ship_containers,
         activate_drag_over_tiles,
+        place_ship_DOM,
     };
 })();
 

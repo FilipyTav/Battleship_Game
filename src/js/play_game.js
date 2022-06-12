@@ -16,6 +16,19 @@ const play_game = () => {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
+    const random_axis = () => {
+        switch (random_int(0, 1)) {
+            case 0:
+                return "x";
+
+            case 1:
+                return "y";
+
+            default:
+                return;
+        }
+    };
+
     let end = false;
     const reset_game = () => {
         player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
@@ -153,11 +166,87 @@ const play_game = () => {
     DOM_el.create_ship_DOM(4);
     DOM_el.create_ship_DOM(5);
 
-    DOM_el.activate_drag_over_tiles(player1);
-
     document.addEventListener("keydown", (e) => {
-        if (e.key === "d") console.log(player1.gameboard.tiles);
+        if (e.key === "d") console.log(computer.gameboard);
     });
+
+    for (let i = 0; i < 5; i++) {
+        let ship_size = null;
+
+        let row = null;
+        let column = null;
+
+        const axis = random_axis();
+
+        switch (i) {
+            case 0:
+                ship_size = 2;
+                break;
+
+            case 1:
+                ship_size = 3;
+                break;
+
+            case 2:
+                ship_size = 3;
+                break;
+
+            case 3:
+                ship_size = 4;
+                break;
+
+            case 4:
+                ship_size = 5;
+                break;
+
+            default:
+                return;
+        }
+
+        switch (axis) {
+            case "x":
+                row = random_int(0, 9);
+                column = random_int(0, 9 - (ship_size - 1));
+
+            case "y":
+                row = random_int(0, 9 - (ship_size - 1));
+                column = random_int(0, 9);
+                break;
+
+            default:
+                return;
+        }
+
+        let valid = false;
+        while (valid === false) {
+            const axis = random_axis();
+            switch (axis) {
+                case "x":
+                    row = random_int(0, 9);
+                    column = random_int(0, 9 - (ship_size - 1));
+
+                case "y":
+                    row = random_int(0, 9 - (ship_size - 1));
+                    column = random_int(0, 9);
+                    break;
+
+                default:
+                    return;
+            }
+
+            if (
+                DOM_el.place_ship_DOM(
+                    computer,
+                    ship_size,
+                    [row, column],
+                    axis
+                ) !== false
+            )
+                valid = true;
+        }
+    }
+
+    DOM_el.activate_drag_over_tiles(player1);
 };
 
 export { play_game };
