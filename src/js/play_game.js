@@ -1,5 +1,6 @@
 import { Player } from "./player";
 import { DOM_el } from "./DOM_elements";
+import { Game } from "./game";
 
 const play_game = () => {
     const player1 = Player("human");
@@ -10,243 +11,18 @@ const play_game = () => {
 
     DOM_el.get_board_tiles(player1).forEach((tile) => tile.classList.add("no"));
 
-    const random_int = (min, max) => {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    const random_axis = () => {
-        switch (random_int(0, 1)) {
-            case 0:
-                return "x";
-
-            case 1:
-                return "y";
-
-            default:
-                return;
-        }
-    };
-
-    let end = false;
-    const reset_game = () => {
-        player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
-
-        computer.gameboard.ships.splice(0, player1.gameboard.ships.length);
-
-        for (let i = 0; i < computer.gameboard.tiles.length; i++) {
-            for (let j = 0; j < computer.gameboard.tiles[i].length; j++) {
-                computer.gameboard.tiles[i][j] = "w";
-                player1.gameboard.tiles[i][j] = "w";
-            }
-        }
-
-        end = true;
-        play_game();
-    };
-
-    player1.attack = ([row, column]) => {
-        const result = computer.gameboard.receive_attack([row, column]);
-
-        switch (result) {
-            case true:
-                alert("You win!!!");
-                reset_game();
-                break;
-
-            case false:
-                break;
-
-            default:
-                return "no";
-        }
-    };
-
-    const cds = [];
-    computer.attack = function () {
-        const row = random_int(0, 9);
-        const column = random_int(0, 9);
-
-        cds[0] = row;
-        cds[1] = column;
-
-        const result = player1.gameboard.receive_attack([row, column]);
-
-        switch (result) {
-            case "no":
-                computer.attack();
-                break;
-
-            case true:
-                setTimeout(() => {
-                    alert("The computer wins!!!");
-                    reset_game();
-                }, 300);
-                break;
-
-            case false:
-                break;
-
-            default:
-                return;
-        }
-    };
-
-    const attack_DOM = (player, [row, column] = [0, 0]) => {
-        switch (player.type) {
-            case "AI":
-                const other_player = player1;
-                player.attack();
-
-                const r = cds[0];
-                const c = cds[1];
-
-                const tile_hit = DOM_el.get_specific_tile(other_player, [r, c]);
-
-                tile_hit.classList.add("hit");
-                break;
-
-            case "human":
-                player.attack([row, column]);
-                break;
-
-            default:
-                return;
-        }
-    };
-
-    const play_turn = (player) => {
-        switch (player.type) {
-            case "AI":
-                attack_DOM(player);
-                break;
-
-            case "human":
-                break;
-
-            default:
-                return;
-        }
-    };
-
-    let coords = null;
-    const select_tile = (e) => {
-        // TODO: Improve the current "turn switch system"
-        e.target.classList.add("hit");
-        coords = e.target.getAttribute("data-id");
-        attack_DOM(player1, [Number(coords[0]), Number(coords[1])]);
-
-        setTimeout(() => {
-            if (end === false) play_turn(computer);
-        }, 300);
-    };
-
-    DOM_el.get_board_tiles(computer).forEach((tile) => {
-        tile.addEventListener("click", select_tile, {
-            once: true,
-        });
-    });
-
-    // place_ship_DOM(player1, 2, [0, 1], "x");
-    // place_ship_DOM(player1, 3, [2, 1], "x");
-    // place_ship_DOM(player1, 3, [4, 1], "x");
-    // place_ship_DOM(player1, 4, [6, 1], "x");
-    // place_ship_DOM(player1, 5, [4, 8], "y");
-
-    // place_ship_DOM(computer, 2, [1, 0], "y");
-    // place_ship_DOM(computer, 3, [2, 2], "y");
-    // place_ship_DOM(computer, 3, [3, 4], "y");
-    // place_ship_DOM(computer, 4, [4, 6], "y");
-    // place_ship_DOM(computer, 5, [5, 8], "y");
-
-    DOM_el.create_ship_DOM(2);
-    DOM_el.create_ship_DOM(3);
-    DOM_el.create_ship_DOM(3);
-    DOM_el.create_ship_DOM(4);
-    DOM_el.create_ship_DOM(5);
+    Game.add_attack_methods(player1, computer);
+    Game.add_attack_methods(computer, player1);
 
     document.addEventListener("keydown", (e) => {
         if (e.key === "d") console.log(computer.gameboard);
     });
 
-    for (let i = 0; i < 5; i++) {
-        let ship_size = null;
+    Game.choose_tiles_automatically(computer);
 
-        let row = null;
-        let column = null;
+    DOM_el.reset_ships_container();
 
-        const axis = random_axis();
-
-        switch (i) {
-            case 0:
-                ship_size = 2;
-                break;
-
-            case 1:
-                ship_size = 3;
-                break;
-
-            case 2:
-                ship_size = 3;
-                break;
-
-            case 3:
-                ship_size = 4;
-                break;
-
-            case 4:
-                ship_size = 5;
-                break;
-
-            default:
-                return;
-        }
-
-        switch (axis) {
-            case "x":
-                row = random_int(0, 9);
-                column = random_int(0, 9 - (ship_size - 1));
-
-            case "y":
-                row = random_int(0, 9 - (ship_size - 1));
-                column = random_int(0, 9);
-                break;
-
-            default:
-                return;
-        }
-
-        let valid = false;
-        while (valid === false) {
-            const axis = random_axis();
-            switch (axis) {
-                case "x":
-                    row = random_int(0, 9);
-                    column = random_int(0, 9 - (ship_size - 1));
-
-                case "y":
-                    row = random_int(0, 9 - (ship_size - 1));
-                    column = random_int(0, 9);
-                    break;
-
-                default:
-                    return;
-            }
-
-            if (
-                DOM_el.place_ship_DOM(
-                    computer,
-                    ship_size,
-                    [row, column],
-                    axis
-                ) !== false
-            )
-                valid = true;
-        }
-    }
-
-    DOM_el.activate_drag_over_tiles(player1);
+    DOM_el.activate_drag_over_tiles(player1, computer);
 };
 
 export { play_game };
