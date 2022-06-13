@@ -136,7 +136,8 @@ button.change_orientation:active {
     user-select: none;
 }
 
-.start_game_btn {
+.start_game_btn,
+.restart {
     padding: 5px 15px;
     border-radius: 10px;
     font-weight: bold;
@@ -150,4 +151,11 @@ button.change_orientation:active {
 
 .start_game_btn:active {
     background: rgb(35, 98, 100);
+}
+
+button.restart {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

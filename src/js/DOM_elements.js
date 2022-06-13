@@ -6,6 +6,8 @@ const DOM_el = (function () {
     const player1_board = document.querySelector(".player1_board");
     const computer_board = document.querySelector(".computer_board");
 
+    const restart_btn = document.querySelector(".restart");
+
     const ships_container = document.querySelector(".ships_container");
 
     const create_board_tile = () => {
@@ -359,6 +361,7 @@ const DOM_el = (function () {
         activate_drag_over_tiles,
         place_ship_DOM,
         reset_ships_container,
+        restart_btn,
     };
 })();
 
