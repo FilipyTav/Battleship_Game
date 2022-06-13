@@ -1,3 +1,4 @@
+import { DOM_el } from "./DOM_elements";
 import { Ship } from "./ship";
 
 const Gameboard = function () {
@@ -77,6 +78,7 @@ const Gameboard = function () {
     };
 
     const receive_attack = ([row, column]) => {
+        let won = null;
         switch (tiles[row][column]) {
             case 0:
                 tiles[row][column] = 1;
@@ -90,17 +92,20 @@ const Gameboard = function () {
                 const part_hit = coords_array.indexOf(`(${row},${column})`);
                 ship_hit.hit(part_hit);
 
-                break;
+                won = ships.every((ship) => ship.is_sunk());
+
+                return { won, hit: "yes" };
 
             case "w":
                 tiles[row][column] = "m";
-                break;
+
+                won = ships.every((ship) => ship.is_sunk());
+
+                return { won, hit: "no" };
 
             default:
                 return "no";
         }
-
-        return ships.every((ship) => ship.is_sunk());
     };
 
     return {

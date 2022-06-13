@@ -103,7 +103,11 @@ const DOM_el = (function () {
 
                 next = tile;
                 for (let i = 0; i < ship_size; i++) {
-                    if (next.classList.contains("ship_part")) return false;
+                    if (
+                        next.classList.contains("ship_part") ||
+                        player.gameboard.tiles[row][column + i] === 0
+                    )
+                        return false;
                     next = get_next_tile(ship_orientation, player, next);
                 }
 
@@ -114,14 +118,18 @@ const DOM_el = (function () {
 
                 next = tile;
                 for (let i = 0; i < ship_size; i++) {
-                    if (next.classList.contains("ship_part")) return false;
+                    if (
+                        next.classList.contains("ship_part") ||
+                        player.gameboard.tiles[row + i][column] === 0
+                    )
+                        return false;
                     next = get_next_tile(ship_orientation, player, next);
                 }
 
                 return true;
 
             default:
-                return;
+                return false;
         }
     };
 
@@ -154,13 +162,14 @@ const DOM_el = (function () {
                     break;
             }
 
-            ship_tiles.forEach((tile) => tile.classList.add("ship_part"));
-
             const placed_ship = player.gameboard.place_ship(
                 length,
                 [row, column],
                 axis
             );
+
+            if (player.type === "human")
+                ship_tiles.forEach((tile) => tile.classList.add("ship_part"));
         } else {
             return false;
         }
@@ -211,7 +220,6 @@ const DOM_el = (function () {
         attack_DOM(Game.player1, [Number(coords[0]), Number(coords[1])]);
 
         setTimeout(() => {
-            console.log(Game.end[0]);
             if (Game.end[0] === false) play_turn(Game.computer);
         }, 300);
     };

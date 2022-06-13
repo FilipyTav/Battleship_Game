@@ -12,10 +12,6 @@ const Game = (function () {
         add_attack_methods(player1);
         add_attack_methods(computer);
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "d") console.log(computer.gameboard);
-        });
-
         choose_tiles_automatically(computer);
 
         DOM_el.reset_ships_container();
@@ -32,9 +28,7 @@ const Game = (function () {
             })
         );
 
-        setTimeout(() => {
-            DOM_el.activate_drag_over_tiles(player1);
-        }, 100);
+        DOM_el.activate_drag_over_tiles(player1);
     };
 
     const random_int = (min, max) => {
@@ -82,7 +76,7 @@ const Game = (function () {
     const add_attack_methods = (player) => {
         switch (player.type) {
             case "AI":
-                player.attack = function () {
+                player.attack = function (...coords) {
                     const row = random_int(0, 9);
                     const column = random_int(0, 9);
 
@@ -94,19 +88,20 @@ const Game = (function () {
                         column,
                     ]);
 
-                    switch (result) {
-                        case "no":
+                    switch (true) {
+                        case result === "no":
                             player.attack();
                             break;
 
-                        case true:
+                        case result.won === true:
                             setTimeout(() => {
                                 alert("The computer wins!!!");
                                 reset_game();
                             }, 300);
                             break;
 
-                        case false:
+                        // TODO: make the AI hit a adjacent tile if it hits a ship
+                        case result.won === false && result.hit === "yes":
                             break;
 
                         default:
@@ -122,13 +117,22 @@ const Game = (function () {
                         column,
                     ]);
 
-                    switch (result) {
-                        case true:
-                            alert("You win!!!");
-                            reset_game();
+                    const selected_tile = DOM_el.get_specific_tile(computer, [
+                        row,
+                        column,
+                    ]);
+
+                    switch (true) {
+                        case result.won === false && result.hit === "yes":
+                            selected_tile.classList.add("ship_part", "hit");
                             break;
 
-                        case false:
+                        case result.won === true:
+                            selected_tile.classList.add("ship_part", "hit");
+                            setTimeout(() => {
+                                alert("You win!!!");
+                                reset_game();
+                            }, 200);
                             break;
 
                         default:
