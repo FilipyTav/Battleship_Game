@@ -173,11 +173,11 @@ const DOM_el = (function () {
     const reset_ships_container = () => {
         while (ships_container.lastChild) ships_container.lastChild.remove();
 
-        DOM_el.create_ship_DOM(2);
-        DOM_el.create_ship_DOM(3);
-        DOM_el.create_ship_DOM(3);
-        DOM_el.create_ship_DOM(4);
-        DOM_el.create_ship_DOM(5);
+        create_ship_DOM(2);
+        create_ship_DOM(3);
+        create_ship_DOM(3);
+        create_ship_DOM(4);
+        create_ship_DOM(5);
     };
 
     const attack_DOM = (player, [row, column] = [0, 0]) => {
@@ -211,8 +211,8 @@ const DOM_el = (function () {
         attack_DOM(Game.player1, [Number(coords[0]), Number(coords[1])]);
 
         setTimeout(() => {
-            console.log(Game.end);
-            if (Game.end === false) play_turn(Game.computer);
+            console.log(Game.end[0]);
+            if (Game.end[0] === false) play_turn(Game.computer);
         }, 300);
     };
 

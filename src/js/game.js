@@ -20,7 +20,21 @@ const Game = (function () {
 
         DOM_el.reset_ships_container();
 
-        DOM_el.activate_drag_over_tiles(player1);
+        DOM_el.all_ship_containers().forEach((container) =>
+            container.addEventListener("dragstart", () => {
+                container.classList.toggle("being_dragged");
+            })
+        );
+
+        DOM_el.all_ship_containers().forEach((container) =>
+            container.addEventListener("dragend", () => {
+                container.classList.toggle("being_dragged");
+            })
+        );
+
+        setTimeout(() => {
+            DOM_el.activate_drag_over_tiles(player1);
+        }, 100);
     };
 
     const random_int = (min, max) => {
@@ -42,11 +56,11 @@ const Game = (function () {
         }
     };
 
-    let end = false;
+    const end = [false];
     const reset_game = () => {
-        end = true;
-        player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
+        end[0] = true;
 
+        player1.gameboard.ships.splice(0, player1.gameboard.ships.length);
         computer.gameboard.ships.splice(0, computer.gameboard.ships.length);
 
         for (let i = 0; i < computer.gameboard.tiles.length; i++) {
@@ -57,6 +71,10 @@ const Game = (function () {
         }
 
         play_game();
+
+        setTimeout(() => {
+            end[0] = false;
+        }, 400);
     };
 
     const cds = [];

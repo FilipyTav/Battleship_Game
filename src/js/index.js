@@ -5,17 +5,6 @@ import { Game } from "./game";
 
 const init = function () {
     Game.play_game();
-    DOM_el.all_ship_containers().forEach((container) =>
-        container.addEventListener("dragstart", () => {
-            container.classList.toggle("being_dragged");
-        })
-    );
-
-    DOM_el.all_ship_containers().forEach((container) =>
-        container.addEventListener("dragend", () => {
-            container.classList.toggle("being_dragged");
-        })
-    );
 
     document.addEventListener("keydown", (e) => {
         if (e.key === "r") Game.reset_game();
